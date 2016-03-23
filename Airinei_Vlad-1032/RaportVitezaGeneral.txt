@@ -1,0 +1,3 @@
+Viteza medie urbana pentru cele 3 autovehicule este : 50
+Viteza medie pentru cele 3 autovehicule este : 90
+

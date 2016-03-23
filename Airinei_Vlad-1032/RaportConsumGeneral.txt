@@ -1,0 +1,3 @@
+Consumul mediu urban pentru cele 3 autovehicule este : 8.66667
+Consumul mediu pentru cele 3 autovehicule este : 6
+

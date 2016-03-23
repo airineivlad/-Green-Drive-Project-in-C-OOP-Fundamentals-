@@ -1,0 +1,1615 @@
+#include<iostream>
+#include<string.h>
+#include<memory.h>
+#include<conio.h>
+#include<math.h>
+
+using namespace std;
+
+class Motorizare{
+
+private:
+	bool nou;
+	char* tip;
+	int vitezaMaxima;
+	int capacitateCilindrica;
+
+public:
+
+	//Constructori
+	Motorizare(bool n, char* t, int v, int cc){
+
+		this->nou = n;
+		this->capacitateCilindrica = cc;
+		this->vitezaMaxima = v;
+
+		this->tip = new char[strlen(t) + 1];
+		strcpy_s(this->tip, strlen(t) + 1, t);
+	}
+
+	Motorizare(char* t, int v, int cc){
+
+		this->nou = true;
+		this->capacitateCilindrica = cc;
+		this->vitezaMaxima = v;
+
+		this->tip = new char[strlen(t) + 1];
+		strcpy_s(this->tip, strlen(t) + 1, t);
+	}
+
+	Motorizare(){
+		this->nou = true;
+		this->tip = new char[strlen("None") + 1];
+		strcpy_s(this->tip, strlen("None") + 1, "None");
+		this->vitezaMaxima = 0;
+		this->capacitateCilindrica = 500; // capacitate cilindrica default
+
+	}
+
+	Motorizare(Motorizare& mot){
+		if (mot.tip != NULL){
+			this->tip = new char[strlen(mot.tip) + 1];
+			strcpy_s(this->tip, strlen(mot.tip) + 1, mot.tip);
+		}
+		else{
+			this->tip = NULL;
+		}
+
+		this->nou = mot.nou;
+		this->vitezaMaxima = mot.vitezaMaxima;
+		this->capacitateCilindrica = mot.capacitateCilindrica;
+	}
+
+	//Destructor
+	~Motorizare(){
+		if (this->tip != NULL){
+			delete[strlen(this->tip) + 1] this->tip;
+			this->tip = NULL;
+		}
+
+		this->capacitateCilindrica = 500;
+		this->vitezaMaxima = 0;
+	}
+
+	//Operatori
+	Motorizare& operator*(int a){
+		this->vitezaMaxima *= a;
+
+		return *this;
+	}
+
+	Motorizare& operator/(int a){
+		this->vitezaMaxima = this->vitezaMaxima / a;
+
+		return *this;
+	}
+
+	Motorizare& operator-=(int a){
+		this->vitezaMaxima -= a;
+
+		return *this;
+	}
+
+	Motorizare& operator*=(int a){
+		this->capacitateCilindrica *= a;
+
+		return *this;
+	}
+
+	//postincrementare
+	Motorizare operator++(){
+		Motorizare d = *this;
+		this->vitezaMaxima++;
+		return d;
+	}
+
+	//predecrementare
+	friend Motorizare& operator--(Motorizare& t){
+
+		t.setCapacitateCilindrica(t.getCapacitateCilindrica() - 1);
+		return t;
+	}
+
+	friend bool operator!(Motorizare& t){
+
+		return !t.isNou();
+	}
+
+	Motorizare& operator=(Motorizare& mot){
+
+		this->tip = new char[strlen(mot.getTip()) + 1];
+		strcpy_s(this->tip, strlen(mot.getTip()) + 1, mot.getTip());
+
+
+		this->nou = mot.isNou();
+		this->vitezaMaxima = mot.getVitezaMaxima();
+		this->capacitateCilindrica = mot.getCapacitateCilindrica();
+
+		return *this;
+	}
+
+
+	//Setteri si Getteri
+	bool isNou(){
+		return this->nou;
+	}
+
+	void setNou(bool b){
+		this->nou = b;
+	}
+
+	char* getTip(){
+		return this->tip;
+	}
+
+	void setTip(char* t){
+
+		if (t != NULL){
+			this->tip = new char[strlen(t) + 1];
+			strcpy_s(this->tip, strlen(t) + 1, t);
+		}
+		else{
+			this->tip = NULL;
+		}
+	}
+
+	int getVitezaMaxima(){
+		return this->vitezaMaxima;
+	}
+
+	void setVitezaMaxima(int v){
+		if (v > 0){
+			this->vitezaMaxima = v;
+		}
+		else{
+			this->vitezaMaxima = 0;
+		}
+	}
+
+	int getCapacitateCilindrica(){
+		return this->capacitateCilindrica;
+	}
+
+	void setCapacitateCilindrica(int c){
+		if (c > 500){
+			this->capacitateCilindrica = c;
+		}
+		else{
+			this->capacitateCilindrica = 500;
+		}
+	}
+
+	//Metode de prelucrare
+	void ReducereViteza(int x){
+
+		if (x < this->vitezaMaxima){
+			this->vitezaMaxima = this->vitezaMaxima - x;
+		}
+	}
+
+	void Invechire(){
+		if (this->nou == true){
+			this->nou = false;
+		}
+	}
+
+	//Citire-scriere consola
+	friend ostream& operator<<(ostream&, Motorizare&);
+	friend istream& operator>>(istream&, Motorizare&);
+
+};
+
+istream& operator>>(istream& in, Motorizare& mot){
+
+	cout << "Motorul este nou? (1 - Da / 0 - Nu) ";
+	int b;
+	in >> b;
+	if (b == 1){
+		mot.nou = true;
+	}
+	else{
+		mot.nou = false;
+	}
+	cout << "Tipul motorului: ";
+	char aux[100];
+	in >> aux;
+	if (mot.tip != NULL){
+		delete[strlen(mot.tip) + 1] mot.tip;
+		mot.tip = NULL;
+	}
+
+	mot.tip = new char[strlen(aux) + 1];
+	strcpy_s(mot.tip, strlen(aux) + 1, aux);
+
+	cout << "Viteza maxima: ";
+	in >> mot.vitezaMaxima;
+	cout << "Capacitatea cilindrica a motorului: ";
+	in >> mot.capacitateCilindrica;
+	cout << endl;
+	return in;
+};
+
+ostream& operator<<(ostream& out, Motorizare& mot){
+	out << "engine: " << mot.tip << endl;
+	out << "max_speed: " << mot.vitezaMaxima << endl;
+	out << "egine_cc: " << mot.capacitateCilindrica << endl;
+	return out;
+}
+
+class Automobil{
+
+private:
+	const int idAutomobil;
+	char* denumire;
+	Motorizare motor;
+	int avg[4]; // 1,2 - Consum mediu si viteza medie urbane; 3,4 Consum mediu si viteza medie normala
+	static int numarAutomobile;
+
+public:
+
+	//Constructori Automobil
+	Automobil() :idAutomobil(numarAutomobile + 1){
+
+		this->denumire = new char[strlen("None") + 1];
+		strcpy_s(this->denumire, strlen("None") + 1, "None");
+
+		this->motor = Motorizare(true, "None", 0, 500);
+
+		for (int i = 1; i <= 4; i++){
+			this->avg[i] = 0;
+		}
+		this->numarAutomobile++;
+	}
+
+	Automobil(char* den, Motorizare m, int consumMediuUrban, int vitezaMedieUrbana, int consumMediu, int vitezaMedie) :idAutomobil(numarAutomobile + 1){
+		if (den != NULL){
+			this->denumire = new char[strlen(den) + 1];
+			strcpy_s(this->denumire, strlen(den) + 1, den);
+		}
+		else{
+			this->denumire = den;
+		}
+
+		this->motor = m;
+		this->avg[1] = consumMediuUrban;
+		this->avg[2] = vitezaMedieUrbana;
+		this->avg[3] = consumMediu;
+		this->avg[4] = vitezaMedie;
+
+		this->numarAutomobile++;
+	}
+
+	Automobil(char* den, bool n, char* t, int v, int cc, int consumMediuUrban, int vitezaMedieUrbana, int consumMediu, int vitezaMedie) :idAutomobil(numarAutomobile + 1){
+		if (den != NULL){
+			this->denumire = new char[strlen(den) + 1];
+			strcpy_s(this->denumire, strlen(den) + 1, den);
+		}
+		else{
+			this->denumire = den;
+		}
+		Motorizare m(n, t, v, cc);
+		this->motor = m;
+		avg[1] = consumMediuUrban;
+		avg[2] = vitezaMedieUrbana;
+		avg[3] = consumMediu;
+		avg[4] = vitezaMedie;
+
+		this->numarAutomobile++;
+	}
+
+	Automobil(Automobil& aut) :idAutomobil(numarAutomobile + 1){
+		if (aut.denumire != NULL){
+			this->denumire = new char[strlen(aut.denumire) + 1];
+			strcpy_s(this->denumire, strlen(aut.denumire) + 1, aut.denumire);
+		}
+		else{
+			this->denumire = aut.denumire;
+		}
+
+		this->motor = aut.motor;
+		for (int i = 1; i <= 4; i++){
+			this->avg[i] = aut.avg[i];
+		}
+
+		this->numarAutomobile++;
+	}
+
+	//Destructor Automobil
+	~Automobil(){
+		if (this->denumire != NULL){
+			delete[strlen(this->denumire) + 1] this->denumire;
+			this->denumire = NULL;
+		}
+
+		this->numarAutomobile--;
+	}
+
+	//Getter si Setteri Automobil
+	int getIdAutomobil(){
+		return this->idAutomobil;
+	}
+
+	char* getDenumire(){
+		return this->denumire;
+	}
+
+	int getAvgConsumUrban(){
+		return this->avg[1];
+	}
+
+	int getAvgSpeedUrban(){
+		return this->avg[2];
+	}
+
+	int getAvgConsum(){
+		return this->avg[3];
+	}
+
+	int getAvgSpeed(){
+		return this->avg[4];
+	}
+
+	void setDenumire(char* den){
+
+		if (den != NULL){
+			this->denumire = new char[strlen(den) + 1];
+			strcpy_s(this->denumire, strlen(den) + 1, den);
+		}
+		else{
+			this->denumire = NULL;
+		}
+	}
+
+	void setMotor(Motorizare& m){
+		this->motor = m;
+	}
+
+
+	void getAvgConsumUrban(int avg){
+		this->avg[1] = avg;
+	}
+
+	void getAvgSpeedUrban(int avg){
+		this->avg[2] = avg;
+	}
+
+
+	void getAvgConsum(int avg){
+		this->avg[3] = avg;
+	}
+
+
+	void getAvgSpeed(int avg){
+		this->avg[4] = avg;
+	}
+
+	//Operatori
+	Automobil& operator=(Automobil& aut){
+		if (aut.denumire != NULL){
+			this->denumire = new char[strlen(aut.denumire) + 1];
+			strcpy_s(this->denumire, strlen(aut.denumire) + 1, aut.denumire);
+		}
+		else{
+			this->denumire = aut.denumire;
+		}
+
+		this->motor = aut.motor;
+
+		for (int i = 1; i <= 4; i++){
+			this->avg[i] = aut.avg[i];
+		}
+
+		return *this;
+	}
+
+	int &operator[](int index)
+	{
+		if (0<index && index <= 4)
+			return avg[index];
+		return avg[0];
+	}
+
+	//Metode de prelucrare
+	int DiferentaConsumMediu(){
+		return this->avg[1] - this->avg[3];
+	}
+
+	int DiferentaVitezaMediu(){
+		return this->avg[2] - this->avg[4];
+	}
+
+	//Citire-scriere consola
+	friend ostream& operator<<(ostream&, Automobil&);
+	friend istream& operator>>(istream&, Automobil&);
+};
+
+int Automobil::numarAutomobile = 0;
+
+istream& operator>>(istream& in, Automobil& aut){
+
+	cout << "Denumirea autovehiculului: ";
+	char aux[100];
+	in >> aux;
+	if (aut.denumire != NULL){
+		delete[strlen(aut.denumire) + 1] aut.denumire;
+		aut.denumire = NULL;
+	}
+
+	aut.denumire = new char[strlen(aux) + 1];
+	strcpy_s(aut.denumire, strlen(aux) + 1, aux);
+
+	in >> aut.motor;
+
+	cout << "Consum mediu urban: ";
+	in >> aut.avg[1];
+	cout << "Viteza medie urbana: ";
+	in >> aut.avg[2];
+	cout << "Consum mediu: ";
+	in >> aut.avg[3];
+	cout << "Viteza medie: ";
+	in >> aut.avg[4];
+	cout << endl;
+
+	return in;
+};
+
+ostream& operator<<(ostream& out, Automobil& aut){
+	out << aut.denumire << endl;
+	out << aut.motor;
+	out << "avg_consumption_urban: " << aut.avg[1] << endl;
+	out << "avg_speed_urban: " << aut.avg[2] << endl;
+	out << "avg_consumption_: " << aut.avg[3] << endl;
+	out << "avg_speed: " << aut.avg[4] << endl;
+	return out;
+}
+
+class Punct{
+private:
+	char* tip;
+	long double latitudine;
+	long double longitudine;
+
+public:
+
+	//Constructori
+	Punct(){
+		this->tip = new char[strlen("Origine") + 1];
+		strcpy_s(this->tip, strlen("Origine") + 1, "Origine");
+		latitudine = 0;
+		longitudine = 0;
+	}
+	Punct(char* e, long double a, long double b){
+		this->tip = new char[strlen(e) + 1];
+		memcpy(this->tip, e, (strlen(e) + 1)*sizeof(char));
+		this->latitudine = a;
+		this->longitudine = b;
+	}
+
+	Punct(Punct& p){
+		if (p.tip != NULL){
+			this->tip = new char[strlen(p.tip) + 1];
+			strcpy_s(this->tip, strlen(p.tip) + 1, p.tip);
+		}
+		else{
+			this->tip = NULL;
+		}
+
+		this->latitudine = p.latitudine;
+		this->longitudine = p.longitudine;
+	}
+
+	//Destructor
+	~Punct(){
+		if (this->tip != NULL){
+			delete[strlen(this->tip) + 1] this->tip;
+			this->tip = NULL;
+		}
+		this->latitudine = 0;
+		this->longitudine = 0;
+	}
+
+	//getteri / setteri
+
+	char* getTip(){
+		return this->tip;
+	}
+
+	void setTip(char* e){
+		if (this->tip != NULL){
+			delete[] this->tip;
+		}
+
+		this->tip = new char[strlen(e) + 1];
+		strcpy_s(this->tip, strlen(e) + 1, e);
+	}
+
+
+	long double getLatitudine(){
+		return this->latitudine;
+	}
+	long double getLongitudine(){
+		return this->longitudine;
+	}
+
+	void setLatitudine(long double x){
+		this->latitudine = x;
+	}
+
+	void setLongitudine(long double y){
+		this->longitudine = y;
+	}
+
+	//operatori
+	Punct& operator=(Punct& s){
+		/*
+		if (this->tip != NULL){
+		delete[strlen(this->tip) + 1] this->tip;
+		this->tip = NULL;
+		}*/
+
+		if (s.tip != NULL){
+			this->tip = new char[strlen(s.tip) + 1];
+			strcpy_s(this->tip, strlen(s.tip) + 1, s.tip);
+		}
+		else{
+			this->tip = NULL;
+		}
+
+		this->latitudine = s.latitudine;
+		this->longitudine = s.longitudine;
+
+		return *this;
+	}
+
+	Punct& operator-(int a){
+		this->latitudine -= a;
+		this->longitudine -= a;
+
+		return *this;
+	}
+
+	Punct& operator+(Punct& s){
+		if (s.tip != NULL){
+			this->latitudine += s.latitudine;
+			this->longitudine += s.longitudine;
+		}
+
+		return *this;
+	}
+
+	Punct& operator+=(int a){
+		this->latitudine += a;
+		this->longitudine += a;
+		return *this;
+	}
+
+	bool operator>(Punct& s){
+		return this->latitudine > s.getLatitudine();
+	}
+
+	//postdecrementare
+	Punct operator--(){
+		Punct d = *this;
+		this->latitudine--;
+		this->longitudine--;
+		return d;
+	}
+
+	//preincrementare
+	friend Punct& operator++(Punct& t){
+
+		t.setLatitudine(t.getLatitudine() + 1);
+		t.setLongitudine(t.getLongitudine() + 1);
+
+		return t;
+	}
+
+	//cast
+	operator long double(){
+		return this->latitudine;
+	}
+
+	//citire/scriere consola
+	friend ostream& operator<<(ostream&, Punct&);
+	friend istream& operator>>(istream&, Punct&);
+};
+
+ostream& operator<<(ostream& out, Punct& x){
+	out << "point: " << x.latitudine << "; " << x.longitudine << endl;
+	return out;
+};
+
+istream& operator>>(istream& in, Punct& p){
+	cout << "Introduceti tip: ";
+	char aux[100];
+	in >> aux;
+	if (p.tip != NULL){
+		delete[strlen(p.tip) + 1] p.tip;
+		p.tip = NULL;
+	}
+	p.tip = new char[strlen(aux) + 1];
+	strcpy_s(p.tip, strlen(aux) + 1, aux);
+
+	cout << "Introduceti latitudine: ";
+	in >> p.latitudine;
+	cout << "Introduceti longitudinea: ";
+	in >> p.longitudine;
+
+	return in;
+};
+
+class Punct3D: public Punct{
+
+private:
+	long double coordonataZ;
+
+public:
+	Punct3D(char* e, long double a, long double b, long double c) :Punct(e, a, b){
+		this->coordonataZ = c;
+	}
+
+	Punct3D() :Punct("None", 0, 0){
+		this->coordonataZ = 0;
+	}
+
+	void setCoordonataZ(long double x){
+
+		this->coordonataZ = x;
+
+	}
+
+	long double getCoordonataZ(){
+
+		return coordonataZ;
+
+	}
+
+	Punct3D operator=(Punct3D& x){
+
+		this->setTip(x.getTip());
+		this->coordonataZ = x.getCoordonataZ();
+		this->setLatitudine (x.getLatitudine());
+		this->setLongitudine(x.getLongitudine());
+
+		return *this;
+	}
+};
+
+ostream& operator<<(ostream& out, Punct3D& x){
+
+	out << x.getTip()<<endl;
+	out << x.getLatitudine() << endl;
+	out << x.getLongitudine() << endl;
+	out << x.getCoordonataZ() << endl;
+
+	return out;
+}
+
+class GeoCircle{
+
+private:
+	char* tip;
+	char* rest;
+	Punct point;
+	int raza;
+
+public:
+	//Constructori
+	GeoCircle(){
+		this->tip = new char[strlen("None") + 1];
+		strcpy_s(this->tip, strlen("None") + 1, "None");
+
+		this->rest = new char[strlen("None") + 1];
+		strcpy_s(this->rest, strlen("None") + 1, "None");
+
+		this->raza = 0;
+
+	}
+	GeoCircle(char* tip, char* rest, Punct& p, int raza){
+		if (tip != NULL){
+			this->tip = new char[strlen(tip) + 1];
+			strcpy_s(this->tip, strlen(tip) + 1, tip);
+		}
+		else{
+			this->tip = NULL;
+		}
+
+		if (rest != NULL){
+			this->rest = new char[strlen(rest) + 1];
+			strcpy_s(this->rest, strlen(rest) + 1, rest);
+		}
+		else{
+			this->rest = NULL;
+		}
+
+		this->point = p;
+		this->raza = raza;
+	}
+	GeoCircle(char* tip, char* rest, double lat, double lon, int raza){
+		if (tip != NULL){
+			this->tip = new char[strlen(tip) + 1];
+			strcpy_s(this->tip, strlen(tip) + 1, tip);
+		}
+		else{
+			this->tip = NULL;
+		}
+
+		if (rest != NULL){
+			this->rest = new char[strlen(rest) + 1];
+			strcpy_s(this->rest, strlen(rest) + 1, rest);
+		}
+		else{
+			this->rest = NULL;
+		}
+		Punct p("centru", lat, lon);
+		this->point = p;
+		this->raza = raza;
+	}
+
+	GeoCircle(GeoCircle& c){
+
+		if (c.tip != NULL){
+			this->tip = new char[strlen(c.tip) + 1];
+			strcpy_s(this->tip, strlen(c.tip) + 1, c.tip);
+		}
+		else{
+			this->tip = NULL;
+		}
+
+		if (c.rest != NULL){
+			this->rest = new char[strlen(c.rest) + 1];
+			strcpy_s(this->rest, strlen(c.rest) + 1, c.rest);
+		}
+		else{
+			this->rest = NULL;
+		}
+
+		this->point = c.point;
+		this->raza = c.raza;
+	}
+
+	//Destructor
+	~GeoCircle(){
+		delete[] this->tip;
+		delete[] this->rest;
+	}
+
+	//Getteri si setteri
+	char* getTip() {
+		return tip;
+	}
+	void setTip(char* tip) {
+
+		if (this->tip != NULL){
+			delete[] this->tip;
+			this->tip = NULL;
+		}
+
+		if (tip != NULL){
+			this->tip = new char[strlen(tip) + 1];
+			strcpy_s(this->tip, strlen(tip) + 1, tip);
+		}
+	}
+
+	char* getRest() {
+		return rest;
+	}
+	void setRest(char* rest) {
+		if (this->rest != NULL){
+			delete[] this->rest;
+			this->rest = NULL;
+		}
+
+		if (rest != NULL){
+			this->rest = new char[strlen(rest) + 1];
+			strcpy_s(this->rest, strlen(rest) + 1, rest);
+		}
+	}
+
+
+	Punct& getPoint() {
+		return point;
+	}
+	void setPoint(Punct& point) {
+		this->point = point;
+	}
+	int getRaza() {
+		return raza;
+	}
+	void setRaza(int raza) {
+		this->raza = raza;
+	}
+
+	//Operator =
+	GeoCircle& operator=(GeoCircle& c){
+
+		if (c.tip != NULL){
+			this->tip = new char[strlen(c.tip) + 1];
+			strcpy_s(this->tip, strlen(c.tip) + 1, c.tip);
+		}
+		else{
+			this->tip = NULL;
+		}
+
+		if (c.rest != NULL){
+			this->rest = new char[strlen(c.rest) + 1];
+			strcpy_s(this->rest, strlen(c.rest) + 1, c.rest);
+		}
+		else{
+			this->rest = NULL;
+		}
+
+		this->point = c.point;
+		this->raza = c.raza;
+
+		return *this;
+	}
+
+	//Metode de prelucrare
+	void CresteRaza(int x){
+		this->raza = this->raza + x;
+	}
+
+	void ScadeRaza(int x){
+		this->raza = this->raza - x;
+	}
+
+	//Citire-scriere consola
+	friend ostream& operator<<(ostream&, GeoCircle&);
+	friend istream& operator>>(istream&, GeoCircle&);
+};
+
+ostream& operator<<(ostream& out, GeoCircle& c){
+	out << "type: " << c.tip << endl;
+	out << "restriction: " << c.rest << endl;
+	out << "point: " << c.point.getLatitudine() << ";" << c.point.getLongitudine() << endl;
+	out << "radius: " << c.raza << "km" << endl;
+	return out;
+};
+
+istream& operator>>(istream& in, GeoCircle& c){
+	cout << "Introduceti tip: ";
+	char aux[100];
+	in >> aux;
+	if (c.tip != NULL){
+		delete[strlen(c.tip) + 1] c.tip;
+		c.tip = NULL;
+	}
+	c.tip = new char[strlen(aux) + 1];
+	strcpy_s(c.tip, strlen(aux) + 1, aux);
+
+	cout << "Introduceti restrictia: ";
+	in >> aux;
+	if (c.rest != NULL){
+		delete[strlen(c.rest) + 1] c.rest;
+		c.rest = NULL;
+	}
+	c.rest = new char[strlen(aux) + 1];
+	strcpy_s(c.rest, strlen(aux) + 1, aux);
+	cout << "Introduceti latitudinea centrului: ";
+	double la, lo;
+	in >> la;
+	cout << "Introduceti latitudinea centrului: ";
+	in >> lo;
+
+	Punct t("centru", la, lo);
+	c.point = t;
+
+	cout << "Introduceti raza: ";
+	in >> c.raza;
+
+	return in;
+};
+
+class GeoRectangle{
+
+private:
+	char* tip;
+	char* rest;
+	Punct stangaSus, dreaptaJos;
+
+public:
+	//Constructori
+	GeoRectangle(){
+		this->tip = new char[strlen("None") + 1];
+		strcpy_s(this->tip, strlen("None") + 1, "None");
+
+		this->rest = new char[strlen("None") + 1];
+		strcpy_s(this->rest, strlen("None") + 1, "None");
+
+	}
+	GeoRectangle(char* tip, char* rest, Punct& x, Punct& y){
+		if (tip != NULL){
+			this->tip = new char[strlen(tip) + 1];
+			strcpy_s(this->tip, strlen(tip) + 1, tip);
+		}
+		else{
+			this->tip = NULL;
+		}
+
+		if (rest != NULL){
+			this->rest = new char[strlen(rest) + 1];
+			strcpy_s(this->rest, strlen(rest) + 1, rest);
+		}
+		else{
+			this->rest = NULL;
+		}
+
+		this->stangaSus = x;
+		this->dreaptaJos = y;
+	}
+	GeoRectangle(char* tip, char* rest, double lats, double lons, double latd, double lond){
+		if (tip != NULL){
+			this->tip = new char[strlen(tip) + 1];
+			strcpy_s(this->tip, strlen(tip) + 1, tip);
+		}
+		else{
+			this->tip = NULL;
+		}
+
+		if (rest != NULL){
+			this->rest = new char[strlen(rest) + 1];
+			strcpy_s(this->rest, strlen(rest) + 1, rest);
+		}
+		else{
+			this->rest = NULL;
+		}
+		Punct x("left_up_corner", lats, lons);
+		this->stangaSus = x;
+		Punct y("right_down_corner", latd, lond);
+		this->dreaptaJos = y;
+	}
+
+	GeoRectangle(GeoRectangle& c){
+
+		if (c.tip != NULL){
+			this->tip = new char[strlen(c.tip) + 1];
+			strcpy_s(this->tip, strlen(c.tip) + 1, c.tip);
+		}
+		else{
+			this->tip = NULL;
+		}
+
+		if (c.rest != NULL){
+			this->rest = new char[strlen(c.rest) + 1];
+			strcpy_s(this->rest, strlen(c.rest) + 1, c.rest);
+		}
+		else{
+			this->rest = NULL;
+		}
+
+		this->stangaSus = c.stangaSus;
+		this->dreaptaJos = c.dreaptaJos;
+	}
+
+	//Destructor
+	~GeoRectangle(){
+		delete[] this->tip;
+		delete[] this->rest;
+	}
+
+	//Getteri si setteri
+	char* getTip() {
+		return tip;
+	}
+	void setTip(char* tip) {
+
+		if (this->tip != NULL){
+			delete[] this->tip;
+			this->tip = NULL;
+		}
+
+		if (tip != NULL){
+			this->tip = new char[strlen(tip) + 1];
+			strcpy_s(this->tip, strlen(tip) + 1, tip);
+		}
+	}
+
+	char* getRest() {
+		return rest;
+	}
+	void setRest(char* rest) {
+		if (this->rest != NULL){
+			delete[] this->rest;
+			this->rest = NULL;
+		}
+
+		if (rest != NULL){
+			this->rest = new char[strlen(rest) + 1];
+			strcpy_s(this->rest, strlen(rest) + 1, rest);
+		}
+	}
+
+
+	Punct& getStangaSus() {
+		return this->stangaSus;
+	}
+	void setStangaSus(Punct& stangaSus) {
+		this->stangaSus = stangaSus;
+	}
+
+	Punct& getDreaptaJos() {
+		return this->dreaptaJos;
+	}
+	void setDreaptaJos(Punct& dreaptaJos) {
+		this->dreaptaJos = dreaptaJos;
+	}
+
+	//Operator =
+	GeoRectangle& operator=(GeoRectangle& c){
+
+		if (c.tip != NULL){
+			this->tip = new char[strlen(c.tip) + 1];
+			strcpy_s(this->tip, strlen(c.tip) + 1, c.tip);
+		}
+		else{
+			this->tip = NULL;
+		}
+
+		if (c.rest != NULL){
+			this->rest = new char[strlen(c.rest) + 1];
+			strcpy_s(this->rest, strlen(c.rest) + 1, c.rest);
+		}
+		else{
+			this->rest = NULL;
+		}
+
+		this->stangaSus = c.stangaSus;
+		this->dreaptaJos = c.dreaptaJos;
+
+		return *this;
+	}
+
+	//Metode de prelucrare
+	double sumaLatitudinilor(){
+		return this->stangaSus.getLatitudine() + this->dreaptaJos.getLatitudine();
+	}
+
+	void ScadeLongitudine(int x){
+		this->stangaSus.setLongitudine(this->stangaSus.getLongitudine() - x);
+		this->dreaptaJos.setLongitudine(this->dreaptaJos.getLongitudine() - x);
+	}
+
+	//Citire-scriere consola
+	friend ostream& operator<<(ostream&, GeoRectangle&);
+	friend istream& operator>>(istream&, GeoRectangle&);
+};
+
+ostream& operator<<(ostream& out, GeoRectangle& c){
+	out << "type: " << c.tip << endl;
+	out << "restriction: " << c.rest << endl;
+	out << "left_up_corner: " << c.stangaSus.getLatitudine() << "; " << c.stangaSus.getLongitudine() << endl;
+	out << "right_down_corner: " << c.dreaptaJos.getLatitudine() << "; " << c.dreaptaJos.getLongitudine() << endl;
+	return out;
+};
+
+istream& operator>>(istream& in, GeoRectangle& c){
+	cout << "Introduceti tip: ";
+	char aux[100];
+	in >> aux;
+	if (c.tip != NULL){
+		delete[strlen(c.tip) + 1] c.tip;
+		c.tip = NULL;
+	}
+	c.tip = new char[strlen(aux) + 1];
+	strcpy_s(c.tip, strlen(aux) + 1, aux);
+
+	cout << "Introduceti restrictia: ";
+	in >> aux;
+	if (c.rest != NULL){
+		delete[strlen(c.rest) + 1] c.rest;
+		c.rest = NULL;
+	}
+
+	c.rest = new char[strlen(aux) + 1];
+	strcpy_s(c.rest, strlen(aux) + 1, aux);
+
+	cout << "Introduceti latitudinea coltului din stanga sus: ";
+	double la, lo;
+	in >> la;
+	cout << "Introduceti longitudinea coltului din stanga sus: ";
+	in >> lo;
+
+	Punct t1("left_up_corner", la, lo);
+	c.stangaSus = t1;
+
+	cout << "Introduceti latitudinea coltului din dreapta jos: ";
+	in >> la;
+	cout << "Introduceti longitudinea coltului din dreapta jos: ";
+	in >> lo;
+
+	Punct t2("right_down_corner", la, lo);
+	c.dreaptaJos = t2;
+
+	return in;
+};
+
+class Traseu{
+
+private:
+	char* denumireAutomobil;
+	long long time;
+	Punct coord;
+	int viteza;
+
+public:
+	//Constructori
+	Traseu(){
+
+		this->denumireAutomobil = new char[strlen("None") + 1];
+		strcpy_s(this->denumireAutomobil, strlen("None") + 1, "None");
+
+		this->time = 0;
+		this->viteza = 0;
+	}
+
+	Traseu(char* da, long long t, Punct& c, int v){
+		if (da != NULL){
+			this->denumireAutomobil = new char[strlen(da) + 1];
+			strcpy_s(this->denumireAutomobil, strlen(da) + 1, da);
+		}
+		this->time = t;
+		this->coord = c;
+		this->viteza = v;
+	}
+
+	Traseu(char* da, long long t, double la, double lo, int v){
+		if (da != NULL){
+			this->denumireAutomobil = new char[strlen(da) + 1];
+			strcpy_s(this->denumireAutomobil, strlen(da) + 1, da);
+		}
+		this->time = t;
+		Punct c("Coord", la, lo);
+		this->coord = c;
+		this->viteza = v;
+	}
+
+	Traseu(Traseu& t){
+		if (t.denumireAutomobil != NULL){
+			this->denumireAutomobil = new char[strlen(t.denumireAutomobil) + 1];
+			strcpy_s(this->denumireAutomobil, strlen(t.denumireAutomobil) + 1, t.denumireAutomobil);
+		}
+		else{
+			this->denumireAutomobil = NULL;
+		}
+		this->time = t.time;
+		this->coord = t.coord;
+		this->viteza = t.viteza;
+	}
+	//Destructor
+	~Traseu(){
+		delete[] this->denumireAutomobil;
+	}
+	//Operator =
+	Traseu& operator=(Traseu& t){
+
+		if (t.denumireAutomobil != NULL){
+			this->denumireAutomobil = new char[strlen(t.denumireAutomobil) + 1];
+			strcpy_s(this->denumireAutomobil, strlen(t.denumireAutomobil) + 1, t.denumireAutomobil);
+		}
+		else{
+			this->denumireAutomobil = NULL;
+		}
+
+		this->time = t.time;
+		this->coord = t.coord;
+		this->viteza = t.viteza;
+
+		return *this;
+	}
+
+	//Functii prelucrare
+
+	void CresteViteza(int x){
+		this->viteza = this->viteza + x;
+	}
+
+	void ScadeViteza(int x){
+		this->viteza = this->viteza - x;
+	}
+
+	//Getteri si setteri
+	char* getDenumireAutomobil() {
+		return denumireAutomobil;
+	}
+	void setDenumireAutomobil(char* denumireAutomobil) {
+
+		if (this->denumireAutomobil != NULL){
+			delete[] this->denumireAutomobil;
+			this->denumireAutomobil = NULL;
+		}
+
+		if (denumireAutomobil != NULL){
+			this->denumireAutomobil = new char[strlen(denumireAutomobil) + 1];
+			strcpy_s(this->denumireAutomobil, strlen(denumireAutomobil) + 1, denumireAutomobil);
+		}
+	}
+	long long getTime() {
+		return time;
+	}
+	void setTime(long long time) {
+		this->time = time;
+	}
+
+	Punct& getCoord() {
+		return coord;
+	}
+
+	void setCoord(Punct& coord) {
+		this->coord = coord;
+	}
+
+	int getViteza() {
+		return viteza;
+	}
+	void setViteza(int viteza) {
+		this->viteza = viteza;
+	}
+
+	//Citire-scriere consola
+	friend ostream& operator<<(ostream&, Traseu&);
+	friend istream& operator>>(istream&, Traseu&);
+};
+
+ostream& operator<<(ostream& out, Traseu& t){
+	out << t.denumireAutomobil << endl;
+	out << t.time << endl;
+	out << t.coord.getLatitudine() << endl;
+	out << t.coord.getLongitudine() << endl;
+	out << t.viteza << endl;
+	return out;
+};
+
+istream& operator>>(istream& in, Traseu& t){
+
+	char aux[100];
+	in >> aux;
+	if (t.denumireAutomobil != NULL){
+		delete[strlen(t.denumireAutomobil) + 1]t.denumireAutomobil;
+		t.denumireAutomobil = NULL;
+	}
+
+	t.denumireAutomobil = new char[strlen(aux) + 1];
+	strcpy_s(t.denumireAutomobil, strlen(t.denumireAutomobil) + 1, aux);
+
+	in >> t.time;
+	double la, lo;
+	in >> la >> lo;
+	Punct c("Coord", la, la);
+	t.coord = c;
+	in >> t.viteza;
+
+	return in;
+};
+
+class TelematicsTxt{
+
+private:
+
+	char tipul[150];
+	long long time;
+	double langit, longit;
+	int speed;
+	long nrTrasee;
+	Traseu *trasee;
+
+public:
+
+	Traseu& TraseReturn(int i){
+		return trasee[i];
+	}
+
+	void ReadImplicit(char nume[200]){
+		cout << endl << "--------------------" << nume << "--------------------" << endl;
+
+		Traseu ti("auto", 0, 0, 0, 0);
+		Punct pct("coord", 0, 0);
+		ifstream fci(nume, ios_base::in);
+
+		nrTrasee = 0;
+		cout << "Se proceseaza " << nume << " ...";
+		while (fci >> tipul >> time >> langit >> longit >> speed){
+			nrTrasee++;
+
+		}
+		
+		cout << endl;
+		fci.close();
+
+		ifstream fcin(nume, ios_base::in);
+		trasee = new Traseu[nrTrasee];
+		cout << "Se creaza lista de elemnte ...";
+
+		for (int i = 0; i<nrTrasee; i++)
+		{
+			fcin >> tipul >> time >> langit >> longit >> speed;
+
+			ti.setDenumireAutomobil(tipul);
+			ti.setTime(time);
+			pct.setLatitudine(langit);
+			pct.setLongitudine(longit);
+			ti.setCoord(pct);
+			ti.setViteza(speed);
+
+			trasee[i] = ti;
+		}
+
+		cout << endl;
+		cout << "Fisierul " << nume << " a fost procesat..." << endl;
+		cout << "Doriti sa salvati fisierul? (1 - Da / 0 - Nu): " << endl;
+		int ok;
+		cin >> ok;
+		
+		
+		if (ok == 1){
+			char salvare[200] = "copie_";
+			strcat(salvare, nume);
+			ofstream fcout(salvare, ios::out | ios::trunc);
+			
+			for (int i = 0; i<nrTrasee; i++)
+			{
+				fcout << trasee[i];
+			}
+
+			cout << "Fisierul " << nume << " a fost salvat in " << salvare << " ..." << endl;
+			fcout.close();
+		}
+
+		fcin.close();
+	}
+
+	void raportPuncteTelematice(){
+		cout << endl << "Numarul punctelor telematice este de: " << nrTrasee << endl << endl;
+	}
+
+	void raportVitezaMedie(){
+
+		float vit=0.0;
+
+		for (int i = 0; i<nrTrasee; i++)
+		{
+			vit= float(trasee[i].getViteza())/nrTrasee+ vit;
+		}
+
+		cout << endl << "Viteza medie parcursa in punctele telematice este de: " << vit << endl << endl;
+	}
+
+	void raportVitezaMedieAutovehiculX(char numeA[200]){
+
+		int ok = 0;
+		int nr = 0;
+		float v = 0;
+
+		for (int i = 0; i<nrTrasee; i++)
+		{
+			if (strcmp(numeA, trasee[i].getDenumireAutomobil())==0){
+
+				ok = 1;
+				v = v + trasee[i].getViteza();
+				nr++;
+			}
+			
+		}
+
+		if (ok == 1){
+
+			v = v / nr;
+			cout << "Viteza medie cu care a circulat " << numeA << " este de " << v << endl;
+		}
+		else{
+
+			cout << "Autovehiculul " << numeA << " nu exista " << endl;
+		}
+	}
+
+};
+
+class AutoTxt{
+
+private:
+	char s[200], den[200], eng[200];
+	int maxs, engc, avgcu, avgsu, avgc, avgs;
+	int nrAutomobile;
+	Automobil *automobile;
+public:
+
+	Automobil& AutomobilReturn(int i){
+		return automobile[i];
+	}
+
+	void ReadImplicit(char nume[200]){
+
+		cout << endl << "--------------------" << nume << "--------------------" << endl;
+		ifstream fci(nume, ios_base::in);
+
+		nrAutomobile = 0;
+		cout << "Se proceseaza " << nume << " ..." << endl;
+		while (fci >> den >> s >> eng >> s >> maxs >> s >> engc >> s >> avgcu >> s >> avgsu >> s >> avgc >> s >> avgs){
+			nrAutomobile++;
+		}
+		fci.close();
+		ifstream fcin(nume, ios_base::in);
+		automobile = new Automobil[nrAutomobile];
+		cout << "Se creaza lista de elemente ..." << endl;
+		for (int i = 0; i<nrAutomobile; i++)
+		{
+			fcin >> den >> s >> eng >> s >> maxs >> s >> engc >> s >> avgcu >> s >> avgsu >> s >> avgc >> s >> avgs;
+
+			automobile[i] = Automobil(den, true, eng, maxs, engc, avgcu, avgsu, avgc, avgs);
+
+		}
+		cout << "Fisierul " << nume << " a fost procesat..." << endl;
+		cout << "Doriti sa salvati fisierul? (1 - Da / 0 - Nu): " << endl;
+		int ok;
+		cin >> ok;
+		if (ok == 1){
+			char salvare[200] = "copie_";
+			strcat(salvare, nume);
+			ofstream fcout(salvare, ios::out | ios::trunc);
+
+			for (int i = 0; i<nrAutomobile; i++)
+			{
+				fcout << automobile[i];
+			}
+
+			cout << "Fisierul " << nume << " a fost salvat in " << salvare << " ..." << endl;
+			fcout.close();
+		}
+
+		fcin.close();
+	}
+
+
+
+	void raportNumarAutomobile(){
+		
+		cout << endl << "Numarul de automobile distincte este : " << nrAutomobile << endl << endl;
+
+	}
+
+	void raportConsumMediuTotalGeneral(){
+		float cmU = 0, cm = 0;
+		for (int i = 0; i<nrAutomobile; i++)
+		{
+			cmU = automobile[i].getAvgConsumUrban() + cmU;
+			cm = automobile[i].getAvgConsum() + cm;
+		}
+		cmU = cmU / nrAutomobile;
+		cm = cm / nrAutomobile;
+
+		cout << endl << "Consumul mediu urban pentru cele " << nrAutomobile << " autovehicule este : " << cmU<<  endl ;
+		cout  << "Consumul mediu pentru cele " << nrAutomobile << " autovehicule este : " << cm << endl << endl;
+		ofstream fcout("RaportConsumGeneral.txt", ios::out | ios::trunc);
+
+		fcout << "Consumul mediu urban pentru cele " << nrAutomobile << " autovehicule este : " << cmU << endl;
+		fcout << "Consumul mediu pentru cele " << nrAutomobile << " autovehicule este : " << cm << endl << endl;
+
+		cout << endl << "Raportul a fost salvat in fisierul RaportConsumGeneral.txt..." << endl<<endl;
+
+		fcout.close();
+	}
+
+	void raportVitezaMediuTotalGeneral(){
+		float vU = 0, v = 0;
+		for (int i = 0; i<nrAutomobile; i++)
+		{
+			vU = automobile[i].getAvgSpeedUrban() + vU;
+			v = automobile[i].getAvgSpeed() + v;
+		}
+		vU = vU / nrAutomobile;
+		v = v / nrAutomobile;
+
+		cout << endl << "Viteza medie urbana pentru cele " << nrAutomobile << " autovehicule este : " << vU << endl;
+		cout << "Viteza medie pentru cele " << nrAutomobile << " autovehicule este : " << v << endl << endl;
+		ofstream fcout("RaportVitezaGeneral.txt", ios::out | ios::trunc);
+
+		fcout << "Viteza medie urbana pentru cele " << nrAutomobile << " autovehicule este : " << vU << endl;
+		fcout << "Viteza medie pentru cele " << nrAutomobile << " autovehicule este : " << v << endl << endl;
+
+		cout << endl << "Raportul a fost salvat in fisierul RaportVitezaGeneral.txt..." << endl << endl;
+
+		fcout.close();
+	}
+};
+
+class GeoFenceTxt{
+
+private:
+	char s[200], den[200], rest[200], c;
+	long double la1, lo1, la2, lo2;
+	int raz;
+	int nrCercuri, nrDreptunghiuri, nrLinii;
+	int *ordine;
+	GeoCircle *gc;
+	GeoRectangle *gr;
+
+public:
+
+	void ReadImplicit(char nume[200]){
+
+		cout << endl << "--------------------" << nume << "--------------------" << endl;
+		ifstream fci(nume, ios_base::in);
+
+		nrCercuri = 0; nrDreptunghiuri = 0; nrLinii = 1;
+		cout << "Se proceseaza " << nume << " ..." << endl;
+
+		while (fci >> s >> den){
+
+			if (nrLinii % 4 == 1){
+				if (strcmp(den, "circle") == 0){
+					nrCercuri++;
+				}
+				if (strcmp(den, "rectangle") == 0){
+					nrDreptunghiuri++;
+				}
+			}
+			nrLinii++;
+		}
+		//cout << nrCercuri << ' ' << nrDreptunghiuri <<' '<< nrLinii << endl;
+
+		fci.close();
+
+		ifstream fcin(nume, ios_base::in);
+		gc = new GeoCircle[nrCercuri];
+		gr = new GeoRectangle[nrDreptunghiuri];
+		ordine = new int[nrCercuri + nrDreptunghiuri];
+
+		cout << "Se creaza lista de elemente ..." << endl;
+		int i, j;
+		for (i = 0, j = 0; i + j<nrCercuri + nrDreptunghiuri; i = i + 0)
+		{
+			fcin >> s >> den >> s >> rest;
+			if (strcmp(den, "circle") == 0){
+				fcin >> s >> la1 >> c >> lo1;
+				fcin >> s >> raz >> c >> c;
+				gc[i] = GeoCircle(den, rest, la1, lo1, raz);
+				ordine[i + j] = 1;
+				i++;
+			}
+			if (strcmp(den, "rectangle") == 0){
+				fcin >> s >> la1 >> c >> lo1;
+				fcin >> s >> la2 >> c >> lo2;
+				gr[i] = GeoRectangle(den, rest, la1, lo1, la2, lo2);
+				ordine[i + j] = 2;
+				j++;
+			}
+
+		}
+
+		cout << "Fisierul " << nume << " a fost procesat..." << endl;
+		cout << "Doriti sa salvati fisierul? (1 - Da / 0 - Nu): " << endl;
+		int ok;
+		cin >> ok;
+		if (ok == 1){
+			char salvare[200] = "copie_";
+			strcat(salvare, nume);
+			ofstream fout(salvare, ios::out| ios::trunc);
+
+			for (i = 0, j = 0; i + j<nrCercuri + nrDreptunghiuri; i = i + 0)
+			{
+				if (ordine[i + j] == 1){
+
+					fout << gc[i];
+					i++;
+
+				}
+				else{
+
+					fout << gr[j];
+					j++;
+
+				}
+
+			}
+
+			cout << "Fisierul " << nume << " a fost salvat in " << salvare << " ..." << endl;
+			fout.close();
+		}
+
+
+
+		fcin.close();
+	}
+
+
+};
